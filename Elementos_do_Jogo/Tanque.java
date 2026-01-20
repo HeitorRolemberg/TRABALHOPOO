@@ -35,16 +35,6 @@ public class Tanque extends Combatente{
     @Override
     public void receberDano(int dano){
 
-        if(this.vigor >= 55){
-            this.defesa = 9;
-        }
-        else if(this.vigor >= 30){
-            this.defesa = 7;
-        }
-        else{
-             this.defesa = 5;
-        }
-
         if(this.vigor >= 75){
             System.out.println(this.nome + " BLOQUEOU O ATAQUE!");
             this.vigor -= 75;

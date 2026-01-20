@@ -25,7 +25,6 @@ public class Mago extends Combatente{
             this.dano = 25;
             int danoTotal = this.dano - oponente.getDefesa(); 
             oponente.receberDano(danoTotal);
-            oponente.receberDano(danoTotal);
             this.mana += 8;
         }
     }
