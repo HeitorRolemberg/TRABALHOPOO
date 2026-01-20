@@ -1,12 +1,22 @@
-public class Combatente {
-    private String nome;
-    private int experiencia;
+public abstract class Combatente {
+    protected String nome;
     private int vida;
+    private int experiencia;
 
-    public Combatente(String nome, int vidaInicial) {
+    public Combatente(String nome, int vida) {
         this.nome = nome;
-        this.vida = vidaInicial;
-        this.experiencia = 0; 
+        this.vida = vida;
+        this.experiencia = 1;
+    }
+
+    public abstract void atacar(Combatente oponente);
+
+    public void receberDano(int dano){
+        this.vida -= dano;
+    }
+
+    public boolean estarVivo(){
+        return vida > 0;
     }
 
     public String getNome() {
@@ -17,15 +27,15 @@ public class Combatente {
         return vida;
     }
 
-    public int getExperiencia() {
-        return experiencia;
-    }
-
     public void setVida(int vida) {
         this.vida = vida;
     }
 
-    public void setExperiencia(int experiencia) {
-        this.experiencia = experiencia;
+    public int getExperiencia(){
+        return experiencia;
+    }
+
+    public void setExperiencia(int exp){
+        this.experiencia = exp;
     }
 }
