@@ -2,7 +2,7 @@ public class Mago extends Combatente{
     private int mana;
 
     public Mago(String nome){
-        super(nome, 300);
+        super(nome, 300, 0, 5);
         this.mana = 0;
     }
 
@@ -13,12 +13,20 @@ public class Mago extends Combatente{
     @Override
     public void atacar(Combatente oponente){
         System.out.println(this.nome + " golpeu com sua magia o " + oponente.getNome());
+        
         if(this.mana >= 45){
-            oponente.receberDano(50);
+            this.dano = 50;
+            int danoTotal = this.dano - oponente.getDefesa(); 
+            oponente.receberDano(danoTotal);
+            this.mana -= 10;
         }
+        
         else{
-            oponente.receberDano(25);
-            this.mana += 10;
+            this.dano = 25;
+            int danoTotal = this.dano - oponente.getDefesa(); 
+            oponente.receberDano(danoTotal);
+            oponente.receberDano(danoTotal);
+            this.mana += 8;
         }
     }
 
