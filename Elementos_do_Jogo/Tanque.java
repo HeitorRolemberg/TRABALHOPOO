@@ -6,8 +6,8 @@ public class Tanque extends Combatente{
         this.vigor = 0;
     }
 
-    public int getVigor(){
-        return vigor;
+    public void getVigor(){
+        System.out.println(this.nome + " estah com " + this.vigor + " de vigor");
     }
 
     @Override
@@ -40,6 +40,7 @@ public class Tanque extends Combatente{
             this.vigor -= 75;
         }
         else{
+            System.out.println(this.nome + " perdeu " + dano + " PV");
             super.receberDano(dano);
             this.vigor += 10;
         }

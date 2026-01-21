@@ -6,6 +6,23 @@ public class Teste{
 
         t1.atacar(m1);
         m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
 
     }
 }

@@ -12,9 +12,9 @@ public class Mago extends Combatente{
 
     @Override
     public void atacar(Combatente oponente){
-        System.out.println(this.nome + " golpeu com sua magia o " + oponente.getNome());
         
         if(this.mana >= 45){
+            System.out.println(this.nome + " golpeu com sua magia o " + oponente.getNome());
             this.dano = 50;
             int danoTotal = this.dano - oponente.getDefesa(); 
             oponente.receberDano(danoTotal);
@@ -22,6 +22,7 @@ public class Mago extends Combatente{
         }
         
         else{
+            System.out.println(this.nome + " golpeu fracamente o " + oponente.getNome());
             this.dano = 25;
             int danoTotal = this.dano - oponente.getDefesa(); 
             oponente.receberDano(danoTotal);
@@ -31,6 +32,7 @@ public class Mago extends Combatente{
 
     @Override
     public void receberDano(int dano){
+        System.out.println(this.nome + " perdeu " + dano + " PV");
         super.receberDano(dano);
     }
 }

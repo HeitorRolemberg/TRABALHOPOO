@@ -28,6 +28,7 @@ public class Atirador extends Combatente{
 
     @Override
     public void receberDano(int dano){
+        System.out.println(this.nome + " perdeu " + dano + " PV");
         super.receberDano(dano);
     }
 }
