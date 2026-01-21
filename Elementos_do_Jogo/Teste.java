@@ -23,6 +23,12 @@ public class Teste{
         t1.getVigor();
         m1.atacar(t1);
         t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        t1.getVigor();
+        m1.atacar(t1);
+        
 
     }
 }

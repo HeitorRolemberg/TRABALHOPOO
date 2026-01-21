@@ -3,7 +3,7 @@ public class Mago extends Combatente{
 
     public Mago(String nome){
         super(nome, 300, 0, 5);
-        this.mana = 0;
+        this.mana = 75;
     }
 
     public int getMana(){
@@ -18,7 +18,7 @@ public class Mago extends Combatente{
             this.dano = 50;
             int danoTotal = this.dano - oponente.getDefesa(); 
             oponente.receberDano(danoTotal);
-            this.mana -= 10;
+            this.mana -= 5;
         }
         
         else{
@@ -26,7 +26,7 @@ public class Mago extends Combatente{
             this.dano = 25;
             int danoTotal = this.dano - oponente.getDefesa(); 
             oponente.receberDano(danoTotal);
-            this.mana += 8;
+            this.mana += 10;
         }
     }
 

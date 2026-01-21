@@ -3,14 +3,12 @@ public abstract class Combatente {
     private int vida;
     protected int dano;
     protected int defesa;
-    private int experiencia;
-
+   
     public Combatente(String nome, int vida, int dano, int defesa) {
         this.nome = nome;
         this.vida = vida;
         this.dano = dano;
         this.defesa = defesa;
-        this.experiencia = 1;
     }
 
     public abstract void atacar(Combatente oponente);
@@ -19,9 +17,11 @@ public abstract class Combatente {
 
         if(this.vida > dano){
             this.vida -= dano;
+            System.out.println("Vida total de " + this.nome + " : " + this.vida);
         }
         else{
             this.vida = 0;
+            System.out.println(this.nome + " morreu");
         }
     }
 
@@ -43,13 +43,5 @@ public abstract class Combatente {
 
     public void setVida(int vida) {
         this.vida = vida;
-    }
-
-    public int getExperiencia(){
-        return experiencia;
-    }
-
-    public void setExperiencia(int exp){
-        this.experiencia = exp;
     }
 }
