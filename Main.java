@@ -13,8 +13,8 @@ public class Main {
         window.setIconImage(icon.getImage());
 
         // cria e adiciona o painel do jogo (localizado em PainelJogo.java) a janela
-        PainelJogo gamePanel = new PainelJogo(); 
-        window.add(gamePanel);
+        PainelJogo painel = new PainelJogo(); 
+        window.add(painel);
 
         window.pack();
         window.setLocationRelativeTo(null);
