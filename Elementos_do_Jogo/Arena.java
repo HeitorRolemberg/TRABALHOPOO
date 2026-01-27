@@ -16,14 +16,16 @@ public class Arena {
         rodada = 1;
     }
 
-    public void adicionarLadoA(Combatente c) {
-        ladoA[qtdA] = c;
-        qtdA++;
+    public boolean adicionarLadoA(Combatente c) {
+        if (qtdA >= ladoA.length) return false;
+        ladoA[qtdA++] = c;
+        return true;
     }
 
-    public void adicionarLadoB(Combatente c) {
-        ladoB[qtdB] = c;
-        qtdB++;
+    public boolean adicionarLadoB(Combatente c) {
+        if (qtdB >= ladoB.length) return false;
+        ladoB[qtdB++] = c;
+        return true;
     }
 
     public boolean acabou() {
@@ -68,5 +70,26 @@ public class Arena {
                 break;
             }
         }
+    }
+
+    
+    public int getQtdA() {
+        return qtdA;
+    }
+
+    public int getQtdB() {
+        return qtdB;
+    }
+
+    public Combatente[] getLadoA() {
+        return ladoA;
+    }
+
+    public Combatente[] getLadoB() {
+        return ladoB;
+    }
+
+    public int getRodada() {
+        return rodada;
     }
 }
