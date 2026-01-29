@@ -1,34 +1,35 @@
-public class Atirador extends Combatente{
+package Elementos_do_Jogo;
+
+import java.awt.Color;
+
+public class Atirador extends Combatente {
     private int precisao;
 
     public Atirador(String nome){
         super(nome, 250, 0, 3);
         this.precisao = 0;
+        this.cor = Color.GREEN; // Atiradores são VERDES
     }
 
     @Override
-    public void atacar(Combatente oponente){
-
+    public String atacar(Combatente oponente){
         if(this.precisao >= 20){
-            System.out.println(this.nome + " golpeu com um tiro crítico o " + oponente.getNome());
-            this.dano = 70;
-            int danoTotal = this.dano - oponente.getDefesa();
-            oponente.receberDano(danoTotal);
-            this.precisao -= 20;
-        }
+            this.precisao = 0;
+            int danoCritico = 70;
+            int danoReal = danoCritico - oponente.getDefesa();
+            if(danoReal < 0) danoReal = 0;
 
+            String log = oponente.receberDano(danoReal);
+            return this.nome + " HEADSHOT CRÍTICO! " + log;
+        }
         else{
-            System.out.println(this.nome + " golpeu com um tiro o " + oponente.getNome());
-            this.dano = 35;
-            int danoTotal = this.dano - oponente.getDefesa();
-            oponente.receberDano(danoTotal);
-            this.precisao += 5;
-        }
-    }
+            this.precisao += 10;
+            int danoNormal = 35;
+            int danoReal = danoNormal - oponente.getDefesa();
+            if(danoReal < 0) danoReal = 0;
 
-    @Override
-    public void receberDano(int dano){
-        System.out.println(this.nome + " perdeu " + dano + " PV");
-        super.receberDano(dano);
+            String log = oponente.receberDano(danoReal);
+            return this.nome + " atirou uma flecha. " + log;
+        }
     }
 }
