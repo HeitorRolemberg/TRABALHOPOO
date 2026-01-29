@@ -1,48 +1,41 @@
-public class Tanque extends Combatente{
+package Elementos_do_Jogo;
+
+import java.awt.Color;
+
+public class Tanque extends Combatente {
     private int vigor;
 
     public Tanque(String nome){
         super(nome, 400, 45, 5);
-        this.vigor = 0;
-    }
-
-    public void getVigor(){
-        System.out.println(this.nome + " estah com " + this.vigor + " de vigor");
+        this.vigor = 100;
+        this.cor = Color.BLUE; // Tanques são AZUIS
     }
 
     @Override
     public int getDefesa(){
+        if(this.vigor >= 55) return 9;
+        else if(this.vigor >= 30) return 7;
+        else return 5;
+    }
+
+    @Override
+    public String atacar(Combatente oponente){
+        int danoCausado = this.dano - oponente.getDefesa();
+        if(danoCausado < 0) danoCausado = 0;
         
-        if(this.vigor >= 55){
-            return this.defesa = 9;
-        }
-        else if(this.vigor >= 30){
-            return this.defesa = 7;
-        }
-        else{
-            return this.defesa = 5;
-        }
+        String logDano = oponente.receberDano(danoCausado);
+        return this.nome + " (Escudo) atacou! " + logDano;
     }
 
     @Override
-    public void atacar(Combatente oponente){
-        System.out.println(this.nome + " golpeu com escudo o " + oponente.getNome());
-       
-        int danoTotal = this.dano - oponente.getDefesa();
-        oponente.receberDano(danoTotal);
-    }
-
-    @Override
-    public void receberDano(int dano){
-
+    public String receberDano(int dano){
         if(this.vigor >= 75){
-            System.out.println(this.nome + " BLOQUEOU O ATAQUE!");
             this.vigor -= 75;
+            return this.nome + " USOU VIGOR E BLOQUEOU TUDO!";
         }
         else{
-            System.out.println(this.nome + " perdeu " + dano + " PV");
-            super.receberDano(dano);
-            this.vigor += 10;
+            this.vigor += 15;
+            return super.receberDano(dano);
         }
     }
 }
