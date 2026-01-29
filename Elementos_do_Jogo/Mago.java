@@ -1,38 +1,35 @@
-public class Mago extends Combatente{
+package Elementos_do_Jogo;
+
+import java.awt.Color;
+
+public class Mago extends Combatente {
     private int mana;
 
     public Mago(String nome){
-        super(nome, 300, 0, 5);
+        super(nome, 300, 0, 2);
         this.mana = 75;
-    }
-
-    public int getMana(){
-        return mana;
+        this.cor = new Color(128, 0, 128); // Magos são ROXOS (RGB)
     }
 
     @Override
-    public void atacar(Combatente oponente){
-        
+    public String atacar(Combatente oponente){
         if(this.mana >= 45){
-            System.out.println(this.nome + " golpeu com sua magia o " + oponente.getNome());
-            this.dano = 50;
-            int danoTotal = this.dano - oponente.getDefesa(); 
-            oponente.receberDano(danoTotal);
-            this.mana -= 5;
+            this.mana -= 45;
+            int danoMagico = 60;
+            int danoReal = danoMagico - oponente.getDefesa();
+            if(danoReal < 0) danoReal = 0;
+            
+            String log = oponente.receberDano(danoReal);
+            return this.nome + " lançou MAGIA! " + log;
         }
-        
         else{
-            System.out.println(this.nome + " golpeu fracamente o " + oponente.getNome());
-            this.dano = 25;
-            int danoTotal = this.dano - oponente.getDefesa(); 
-            oponente.receberDano(danoTotal);
-            this.mana += 10;
+            this.mana += 20;
+            int danoFraco = 15;
+            int danoReal = danoFraco - oponente.getDefesa();
+            if(danoReal < 0) danoReal = 0;
+            
+            String log = oponente.receberDano(danoReal);
+            return this.nome + " (sem mana) bateu com cajado. " + log;
         }
-    }
-
-    @Override
-    public void receberDano(int dano){
-        System.out.println(this.nome + " perdeu " + dano + " PV");
-        super.receberDano(dano);
     }
 }
