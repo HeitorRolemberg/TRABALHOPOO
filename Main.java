@@ -1,5 +1,4 @@
 import javax.swing.JFrame;
-import javax.swing.ImageIcon;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,15 +7,10 @@ public class Main {
         window.setResizable(false);
         window.setTitle("O Grande Torneio");
 
-        // configura o ícone da janela para o da espada
-        ImageIcon icon = new ImageIcon("Imagens/espada.png"); 
-        window.setIconImage(icon.getImage());
-
-        // cria e adiciona o painel do jogo (localizado em PainelJogo.java) a janela
-        PainelJogo painel = new PainelJogo(); 
+        PainelJogo painel = new PainelJogo();
         window.add(painel);
-
         window.pack();
+
         window.setLocationRelativeTo(null);
         window.setVisible(true);
     }
