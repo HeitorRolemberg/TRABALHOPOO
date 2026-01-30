@@ -1,348 +1,368 @@
+package Interface;
 
-import Elementos_do_Jogo.Arena;
-import Elementos_do_Jogo.Atirador;
-import Elementos_do_Jogo.Combatente;
-import Elementos_do_Jogo.Mago;
-import Elementos_do_Jogo.Tanque;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import Elementos_do_Jogo.*;
 
 public class PainelJogo extends JPanel implements Runnable {
-   final int originalTileSize = 16;
-   final int scale = 3;
-   final int tileSize = 48;
-   Thread gameThread;
-   public int gameState;
-   public final int titleState = 0;
-   public final int cutsceneState = 2;
-   public final int playState = 1;
-   Rectangle btnIniciarArea;
-   Rectangle btnSairArea;
-   BufferedImage imgFundo;
-   BufferedImage imgTitulo;
-   BufferedImage imgIniciar;
-   BufferedImage imgSair;
-   BufferedImage imgCutsceneFundo;
-   int titleFinalW;
-   int titleFinalH;
-   String[] cutsceneDialogos = new String[]{"Em um reino místico, a paz é mantida", "através de um antigo ritual...", "conhecido como o Grande Torneio.", "A cada geração, as duas maiores", "facções do mundo se enfrentam.", "Você é o Senhor da Guerra,", "responsável por comandar a batalha."};
-   int dialogoAtualIndex = 0;
-   Font fonteDialogo = new Font("Monospaced", 1, 16);
-   Arena arena;
-   List<String> logBatalha = new ArrayList();
 
-   public PainelJogo() {
-      this.setPreferredSize(new Dimension(800, 600));
-      this.setBackground(Color.BLACK);
-      this.setDoubleBuffered(true);
-      this.setFocusable(true);
-      this.requestFocusInWindow();
+    Thread gameThread;
 
-      try {
-         this.imgTitulo = ImageIO.read(new File("Imagens/titulo.png"));
-         this.imgIniciar = ImageIO.read(new File("Imagens/iniciar.png"));
-         this.imgSair = ImageIO.read(new File("Imagens/sair.png"));
+    public int gameState;
+    public final int titleState = 0;
+    public final int playState = 1;
+    public final int cutsceneState = 2;
 
-         try {
-            this.imgFundo = ImageIO.read(new File("Imagens/fundo.png"));
-         } catch (Exception var5) {
-         }
+    Rectangle btnIniciarArea, btnSairArea;
 
-         try {
-            this.imgCutsceneFundo = ImageIO.read(new File("Imagens/cutscene.png"));
-         } catch (Exception var4) {
-         }
+    BufferedImage imgFundoMenu, imgTitulo, imgIniciar, imgSair, imgCutsceneFundo;
+    BufferedImage imgArena;
 
-         try {
-            BufferedImage var1 = ImageIO.read(new File("Imagens/cursor.png"));
-            Cursor var2 = Toolkit.getDefaultToolkit().createCustomCursor(var1, new Point(0, 0), "CursorRPG");
-            this.setCursor(var2);
-         } catch (Exception var3) {
-         }
-      } catch (IOException var6) {
-         System.out.println("Aviso: Imagens não encontradas.");
-      }
+    BufferedImage sprTanque, sprMago, sprAtirador;
 
-      if (this.imgTitulo != null) {
-         this.titleFinalW = 380;
-         double var7 = (double)this.imgTitulo.getHeight() / (double)this.imgTitulo.getWidth();
-         this.titleFinalH = (int)((double)this.titleFinalW * var7);
-      }
+    int LARGURA = 800;
+    int ALTURA = 600;
 
-      short var8 = 400;
-      if (this.imgIniciar != null) {
-         this.btnIniciarArea = new Rectangle(200, var8, 180, (int)(180.0 * ((double)this.imgIniciar.getHeight() / (double)this.imgIniciar.getWidth())));
-      } else {
-         this.btnIniciarArea = new Rectangle(200, var8, 180, 60);
-      }
+    int SPRITE_W = 96;
+    int SPRITE_H = 96;
 
-      if (this.imgSair != null) {
-         this.btnSairArea = new Rectangle(420, var8, 180, (int)(180.0 * ((double)this.imgSair.getHeight() / (double)this.imgSair.getWidth())));
-      } else {
-         this.btnSairArea = new Rectangle(420, var8, 180, 60);
-      }
+    int CHAO_Y = 455;
 
-      this.addMouseListener(new MouseHandler());
-      this.addKeyListener(new KeyHandler());
-      this.gameState = 0;
-      this.startGameThread();
-   }
+    // POSIÇÃO DOS BOTÕES (mais fácil de entender/ajustar)
+    int BTN_Y = 400;
+    int BTN_W = 180;
+    int BTN_X1 = 200;
+    int BTN_X2 = 420;
 
-   public void startGameThread() {
-      this.gameThread = new Thread(this);
-      this.gameThread.start();
-   }
+    String[] cutsceneDialogos = {
+            "Em um reino mistico, a paz e mantida",
+            "atraves de um antigo ritual...",
+            "conhecido como o Grande Torneio.",
+            "A cada geracao, as duas maiores",
+            "faccoes do mundo se enfrentam.",
+            "Voce e o Senhor da Guerra,",
+            "responsavel por comandar a batalha."
+    };
+    int dialogoAtualIndex = 0;
 
-   public void configurarBatalha() {
-      this.arena = new Arena();
-      String var1 = JOptionPane.showInputDialog(this, "JOGADOR 1 (Aliança)\nDigite seu nome:");
-      if (var1 == null || var1.trim().isEmpty()) {
-         var1 = "Jogador 1";
-      }
+    Font fonteDialogo = new Font("Monospaced", Font.BOLD, 16);
 
-      String[] var2 = new String[]{"Tanque (Azul)", "Mago (Roxo)", "Atirador (Verde)"};
-      int var3 = JOptionPane.showOptionDialog(this, "Escolha seu Campeão:", "Seleção P1", -1, 1, (Icon)null, var2, var2[0]);
-      this.criarPersonagem(var3, var1, 'A');
-      String var4 = JOptionPane.showInputDialog(this, "JOGADOR 2 (Horda)\nDigite seu nome:");
-      if (var4 == null || var4.trim().isEmpty()) {
-         var4 = "Jogador 2";
-      }
+    Arena arena;
+    List<String> logBatalha = new ArrayList<>();
 
-      int var5 = JOptionPane.showOptionDialog(this, "Escolha seu Campeão:", "Seleção P2", -1, 1, (Icon)null, var2, var2[0]);
-      this.criarPersonagem(var5, var4, 'B');
-      this.logBatalha.clear();
-      this.logBatalha.add("DUELO 1x1 INICIADO!");
-      this.logBatalha.add(var1 + " VS " + var4);
-      this.gameState = 1;
-   }
+    String nomeTimeA = "Alianca da Luz";
+    String nomeTimeB = "Horda das Sombras";
 
-   private void criarPersonagem(int var1, String var2, char var3) {
-      if (var1 == 0) {
-         this.arena.adicionarCombatente(new Tanque(var2), var3);
-      } else if (var1 == 1) {
-         this.arena.adicionarCombatente(new Mago(var2), var3);
-      } else {
-         this.arena.adicionarCombatente(new Atirador(var2), var3);
-      }
+    public PainelJogo() {
+        setPreferredSize(new Dimension(LARGURA, ALTURA));
+        setBackground(Color.BLACK);
+        setFocusable(true);
 
-   }
+        carregarImagens();
+        configurarBotoes();
 
-   public void run() {
-      while(this.gameThread != null) {
-         this.repaint();
+        addMouseListener(new MouseHandler());
+        addKeyListener(new KeyHandler());
 
-         try {
-            Thread.sleep(16L);
-         } catch (InterruptedException var2) {
-            var2.printStackTrace();
-         }
-      }
+        gameState = titleState;
+        startGameThread();
+    }
 
-   }
+    private void carregarImagens() {
+        try {
+            imgTitulo = ImageIO.read(new File("Imagens/titulo.png"));
+            imgIniciar = ImageIO.read(new File("Imagens/iniciar.png"));
+            imgSair = ImageIO.read(new File("Imagens/sair.png"));
 
-   public void paintComponent(Graphics var1) {
-      super.paintComponent(var1);
-      Graphics2D var2 = (Graphics2D)var1;
-      if (this.gameState == 0) {
-         if (this.imgFundo != null) {
-            var2.drawImage(this.imgFundo, 0, 0, 800, 600, (ImageObserver)null);
-         } else {
-            var2.setColor(new Color(70, 120, 180));
-            var2.fillRect(0, 0, 800, 600);
-         }
+            imgFundoMenu = ImageIO.read(new File("Imagens/fundo.png"));
+            imgCutsceneFundo = ImageIO.read(new File("Imagens/cutscene.png"));
+            imgArena = ImageIO.read(new File("Imagens/Arena.png"));
 
-         if (this.imgTitulo != null) {
-            var2.drawImage(this.imgTitulo, (800 - this.titleFinalW) / 2, 100, this.titleFinalW, this.titleFinalH, (ImageObserver)null);
-         }
+            sprTanque = ImageIO.read(new File("Imagens/tanque.png"));
+            sprMago = ImageIO.read(new File("Imagens/mago.png"));
+            sprAtirador = ImageIO.read(new File("Imagens/atirador.png"));
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar imagens.");
+        }
+    }
 
-         if (this.imgIniciar != null) {
-            var2.drawImage(this.imgIniciar, this.btnIniciarArea.x, this.btnIniciarArea.y, this.btnIniciarArea.width, this.btnIniciarArea.height, (ImageObserver)null);
-         } else {
-            var2.setColor(Color.GREEN);
-            var2.fillRect(this.btnIniciarArea.x, this.btnIniciarArea.y, this.btnIniciarArea.width, this.btnIniciarArea.height);
-         }
+    private void configurarBotoes() {
+        btnIniciarArea = new Rectangle(BTN_X1, BTN_Y, BTN_W, 60);
+        btnSairArea = new Rectangle(BTN_X2, BTN_Y, BTN_W, 60);
 
-         if (this.imgSair != null) {
-            var2.drawImage(this.imgSair, this.btnSairArea.x, this.btnSairArea.y, this.btnSairArea.width, this.btnSairArea.height, (ImageObserver)null);
-         } else {
-            var2.setColor(Color.RED);
-            var2.fillRect(this.btnSairArea.x, this.btnSairArea.y, this.btnSairArea.width, this.btnSairArea.height);
-         }
-      } else {
-         int var3;
-         int var4;
-         int var5;
-         if (this.gameState == 2) {
-            if (this.imgCutsceneFundo != null) {
-               var2.drawImage(this.imgCutsceneFundo, 0, 0, 800, 600, (ImageObserver)null);
+        if (imgIniciar != null) {
+            btnIniciarArea.height = (int) (BTN_W * ((double) imgIniciar.getHeight() / imgIniciar.getWidth()));
+        }
+        if (imgSair != null) {
+            btnSairArea.height = (int) (BTN_W * ((double) imgSair.getHeight() / imgSair.getWidth()));
+        }
+    }
+
+    public void startGameThread() {
+        gameThread = new Thread(this);
+        gameThread.start();
+    }
+
+    public void configurarBatalha() {
+        arena = new Arena();
+        logBatalha.clear();
+
+        int qtdA = 1;
+        int qtdB = 1;
+
+        try {
+            String sA = JOptionPane.showInputDialog(this, "Quantos combatentes na " + nomeTimeA + "?");
+            if (sA != null) qtdA = Integer.parseInt(sA.trim());
+        } catch (Exception e) { qtdA = 1; }
+
+        try {
+            String sB = JOptionPane.showInputDialog(this, "Quantos combatentes na " + nomeTimeB + "?");
+            if (sB != null) qtdB = Integer.parseInt(sB.trim());
+        } catch (Exception e) { qtdB = 1; }
+
+        if (qtdA <= 0) qtdA = 1;
+        if (qtdB <= 0) qtdB = 1;
+        if (qtdA > 100) qtdA = 100;
+        if (qtdB > 100) qtdB = 100;
+
+        for (int i = 1; i <= qtdA; i++) {
+            String nome = JOptionPane.showInputDialog(this, nomeTimeA + " - Combatente " + i + "\nNome:");
+            if (nome == null || nome.trim().isEmpty()) nome = "A" + i;
+
+            String[] opcoes = {"Tanque", "Mago", "Atirador"};
+            int tipo = JOptionPane.showOptionDialog(this, "Classe:", nomeTimeA + " - " + nome,
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
+                    null, opcoes, opcoes[0]);
+            if (tipo < 0) tipo = 0;
+
+            Combatente c;
+            if (tipo == 0) c = new Tanque(nome);
+            else if (tipo == 1) c = new Mago(nome);
+            else c = new Atirador(nome);
+
+            arena.adicionarLadoA(c);
+        }
+
+        for (int i = 1; i <= qtdB; i++) {
+            String nome = JOptionPane.showInputDialog(this, nomeTimeB + " - Combatente " + i + "\nNome:");
+            if (nome == null || nome.trim().isEmpty()) nome = "B" + i;
+
+            String[] opcoes = {"Tanque", "Mago", "Atirador"};
+            int tipo = JOptionPane.showOptionDialog(this, "Classe:", nomeTimeB + " - " + nome,
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
+                    null, opcoes, opcoes[0]);
+            if (tipo < 0) tipo = 0;
+
+            Combatente c;
+            if (tipo == 0) c = new Tanque(nome);
+            else if (tipo == 1) c = new Mago(nome);
+            else c = new Atirador(nome);
+
+            arena.adicionarLadoB(c);
+        }
+
+        logBatalha.add("BATALHA INICIADA!");
+        logBatalha.add(nomeTimeA + " VS " + nomeTimeB);
+        logBatalha.add("RESOLUCAO DE DANO:");
+        logBatalha.add("1) Forca do golpe (magia/critico/etc).");
+        logBatalha.add("2) Defensor tenta se defender.");
+        logBatalha.add("3) Dano final reduz os PV.");
+        logBatalha.add("ENTER para avancar.");
+
+        gameState = playState;
+    }
+
+    @Override
+    public void run() {
+        while (gameThread != null) {
+            repaint();
+            try { Thread.sleep(16); } catch (Exception e) {}
+        }
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        if (gameState == titleState) {
+            if (imgFundoMenu != null) g2.drawImage(imgFundoMenu, 0, 0, LARGURA, ALTURA, null);
+            else { g2.setColor(Color.BLACK); g2.fillRect(0,0,LARGURA,ALTURA); }
+
+            if (imgTitulo != null) {
+                int w = 380;
+                int h = (int) (w * ((double) imgTitulo.getHeight() / imgTitulo.getWidth()));
+                g2.drawImage(imgTitulo, (LARGURA - w) / 2, 100, w, h, null);
+            }
+
+            if (imgIniciar != null) g2.drawImage(imgIniciar, btnIniciarArea.x, btnIniciarArea.y, btnIniciarArea.width, btnIniciarArea.height, null);
+            else { g2.setColor(Color.GREEN); g2.fillRect(btnIniciarArea.x, btnIniciarArea.y, btnIniciarArea.width, btnIniciarArea.height); }
+
+            if (imgSair != null) g2.drawImage(imgSair, btnSairArea.x, btnSairArea.y, btnSairArea.width, btnSairArea.height, null);
+            else { g2.setColor(Color.RED); g2.fillRect(btnSairArea.x, btnSairArea.y, btnSairArea.width, btnSairArea.height); }
+        }
+        else if (gameState == cutsceneState) {
+            if (imgCutsceneFundo != null) g2.drawImage(imgCutsceneFundo, 0, 0, LARGURA, ALTURA, null);
+            else { g2.setColor(Color.BLACK); g2.fillRect(0,0,LARGURA,ALTURA); }
+
+            int boxW = 600, boxH = 130, boxX = 100, boxY = 440;
+
+            g2.setColor(Color.BLACK);
+            g2.fillRect(boxX, boxY, boxW, boxH);
+
+            g2.setColor(Color.WHITE);
+            g2.drawRect(boxX, boxY, boxW, boxH);
+
+            g2.setFont(fonteDialogo);
+
+            if (dialogoAtualIndex < 0) dialogoAtualIndex = 0;
+            if (dialogoAtualIndex >= cutsceneDialogos.length) dialogoAtualIndex = cutsceneDialogos.length - 1;
+
+            g2.drawString(cutsceneDialogos[dialogoAtualIndex], boxX + 30, boxY + 60);
+            g2.drawString("[ESPACO] >>", boxX + boxW - 120, boxY + boxH - 15);
+        }
+        else if (gameState == playState) {
+            if (imgArena != null) g2.drawImage(imgArena, 0, 0, LARGURA, ALTURA, null);
+            else { g2.setColor(new Color(60,60,60)); g2.fillRect(0,0,LARGURA,ALTURA); }
+
+            g2.setColor(Color.CYAN);
+            g2.drawString(nomeTimeA, 100, 40);
+            g2.setColor(Color.RED);
+            g2.drawString(nomeTimeB, 600, 40);
+
+            if (arena != null) {
+                desenharTimeNoChao(g2, arena.getTimeA(), true);
+                desenharTimeNoChao(g2, arena.getTimeB(), false);
+            }
+
+            g2.setColor(new Color(0,0,0,160));
+            g2.fillRect(50, 400, 700, 180);
+            g2.setColor(Color.WHITE);
+            g2.drawRect(50, 400, 700, 180);
+
+            int y = 430;
+            int inicio = Math.max(0, logBatalha.size() - 7);
+            for (int i = inicio; i < logBatalha.size(); i++) {
+                g2.drawString(logBatalha.get(i), 70, y);
+                y += 20;
+            }
+
+            g2.setColor(Color.GREEN);
+            g2.drawString("ENTER proximo", 520, 570);
+        }
+
+        g2.dispose();
+    }
+
+    private void desenharTimeNoChao(Graphics2D g2, List<Combatente> time, boolean ladoEsquerdo) {
+        if (time == null || time.isEmpty()) return;
+
+        int centroX = ladoEsquerdo ? 260 : 540;
+
+        int espacoX = 70;
+        int espacoY = 70;
+        int porLinha = 3;
+
+        int vivosIndex = 0;
+        int vivosTotal = 0;
+        for (Combatente c : time) if (c.estaVivo()) vivosTotal++;
+
+        for (Combatente c : time) {
+            if (!c.estaVivo()) continue;
+
+            int col = vivosIndex % porLinha;
+            int lin = vivosIndex / porLinha;
+
+            int totalNaLinha = Math.min(porLinha, vivosTotal - lin * porLinha);
+            int larguraLinha = (totalNaLinha - 1) * espacoX;
+
+            int x = centroX - (larguraLinha/2) + col * espacoX;
+            int ySprite = CHAO_Y - SPRITE_H - (lin * espacoY);
+
+            BufferedImage spr = pegarSprite(c);
+            if (spr != null) {
+                g2.drawImage(spr, x, ySprite, SPRITE_W, SPRITE_H, null);
             } else {
-               var2.setColor(Color.BLACK);
-               var2.fillRect(0, 0, 800, 600);
+                g2.setColor(Color.WHITE);
+                g2.fillRect(x, ySprite, SPRITE_W, SPRITE_H);
             }
 
-            var3 = 600;
-            var4 = 130;
-            var5 = 100;
-            short var6 = 440;
-            var2.setColor(Color.BLACK);
-            var2.fillRect(var5, var6, var3, var4);
-            var2.setColor(Color.WHITE);
-            var2.setStroke(new BasicStroke(5.0F));
-            var2.drawRect(var5, var6, var3, var4);
-            var2.setFont(this.fonteDialogo);
-            if (this.dialogoAtualIndex < this.cutsceneDialogos.length) {
-               var2.drawString(this.cutsceneDialogos[this.dialogoAtualIndex], var5 + 30, var6 + 60);
+            desenharBarraVida(g2, c, x, ySprite - 12);
+
+            g2.setColor(Color.WHITE);
+            g2.drawString(c.getNome(), x, ySprite - 18);
+
+            vivosIndex++;
+        }
+    }
+
+    private void desenharBarraVida(Graphics2D g2, Combatente c, int x, int y) {
+        int w = 80, h = 8;
+
+        g2.setColor(Color.RED);
+        g2.fillRect(x, y, w, h);
+
+        double pct = (double) c.getVida() / c.getVidaMaxima();
+        int verde = (int) (w * pct);
+
+        g2.setColor(Color.GREEN);
+        g2.fillRect(x, y, verde, h);
+
+        g2.setColor(Color.WHITE);
+        g2.drawRect(x, y, w, h);
+    }
+
+    private BufferedImage pegarSprite(Combatente c) {
+        String tipo = c.getClass().getSimpleName().toLowerCase();
+        if (tipo.contains("tanque")) return sprTanque;
+        if (tipo.contains("mago")) return sprMago;
+        if (tipo.contains("atirador")) return sprAtirador;
+        return null;
+    }
+
+    class MouseHandler extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            if (gameState == titleState && e.getButton() == MouseEvent.BUTTON1) {
+                if (btnIniciarArea.contains(e.getPoint())) {
+                    gameState = cutsceneState;
+                    dialogoAtualIndex = 0;
+                } else if (btnSairArea.contains(e.getPoint())) {
+                    System.exit(0);
+                }
             }
+        }
+    }
 
-            var2.setFont(new Font("Monospaced", 2, 12));
-            var2.drawString("[ESPAÇO] >>", var5 + var3 - 100, var6 + var4 - 15);
-         } else if (this.gameState == 1) {
-            var2.setColor(new Color(60, 60, 60));
-            var2.fillRect(0, 0, 800, 600);
-            var2.setColor(Color.WHITE);
-            var2.drawLine(400, 50, 400, 550);
-            var2.setFont(new Font("Monospaced", 1, 14));
-            var2.setColor(Color.CYAN);
-            var2.drawString("JOGADOR 1", 100, 40);
-            var2.setColor(Color.RED);
-            var2.drawString("JOGADOR 2", 550, 40);
-            if (this.arena != null) {
-               this.desenharTime(var2, this.arena.getTimeA(), 100);
-               this.desenharTime(var2, this.arena.getTimeB(), 500);
+    class KeyHandler extends KeyAdapter {
+        public void keyPressed(KeyEvent e) {
+            if (gameState == cutsceneState && e.getKeyCode() == KeyEvent.VK_SPACE) {
+                if (dialogoAtualIndex < cutsceneDialogos.length - 1) {
+                    dialogoAtualIndex++;
+                } else {
+                    configurarBatalha();
+                }
             }
+            else if (gameState == playState && e.getKeyCode() == KeyEvent.VK_ENTER) {
+                List<String> logs = arena.executarRodada();
 
-            var2.setColor(new Color(0, 0, 0, 200));
-            var2.fillRect(50, 400, 700, 180);
-            var2.setColor(Color.WHITE);
-            var2.drawRect(50, 400, 700, 180);
-            var3 = 430;
-            var4 = Math.max(0, this.logBatalha.size() - 7);
+                for (String linha : logs) {
+                    String ajustada = linha.replace("TIME A", nomeTimeA).replace("TIME B", nomeTimeB);
+                    logBatalha.add(ajustada);
 
-            for(var5 = var4; var5 < this.logBatalha.size(); ++var5) {
-               var2.drawString((String)this.logBatalha.get(var5), 70, var3);
-               var3 += 20;
+                    if (ajustada.contains("VENCEU") || ajustada.contains("CAMPE")) {
+                        JOptionPane.showMessageDialog(null, ajustada);
+                        gameState = titleState;
+                        break;
+                    }
+                }
             }
-
-            var2.setColor(Color.GREEN);
-            var2.drawString("[ENTER] PRÓXIMO TURNO", 550, 570);
-         }
-      }
-
-      var2.dispose();
-   }
-
-   private void desenharTime(Graphics2D var1, List<Combatente> var2, int var3) {
-      int var4 = 100;
-
-      for(Iterator var5 = var2.iterator(); var5.hasNext(); var4 += 90) {
-         Combatente var6 = (Combatente)var5.next();
-         if (var6.estaVivo()) {
-            var1.setColor(Color.RED);
-            var1.fillRect(var3, var4 - 15, 50, 8);
-            var1.setColor(Color.GREEN);
-            double var7 = (double)var6.getVida() / (double)var6.getVidaMaxima();
-            int var9 = (int)(50.0 * var7);
-            var1.fillRect(var3, var4 - 15, var9, 8);
-            var1.setColor(Color.WHITE);
-            var1.drawRect(var3, var4 - 15, 50, 8);
-         }
-
-         if (!var6.estaVivo()) {
-            var1.setColor(Color.DARK_GRAY);
-         } else {
-            var1.setColor(var6.getCor());
-         }
-
-         var1.fillRect(var3, var4, 50, 50);
-         var1.setColor(Color.WHITE);
-         var1.drawRect(var3, var4, 50, 50);
-         var1.setFont(new Font("Arial", 0, 12));
-         if (!var6.estaVivo()) {
-            var1.setColor(Color.RED);
-            var1.drawString("X MORTO", var3 + 60, var4 + 30);
-         } else {
-            var1.setColor(Color.WHITE);
-            var1.drawString(var6.getNome(), var3 + 60, var4 + 20);
-            var1.setColor(Color.LIGHT_GRAY);
-            var1.drawString("PV: " + var6.getVida(), var3 + 60, var4 + 40);
-         }
-      }
-
-   }
-
-   class MouseHandler extends MouseAdapter {
-      MouseHandler() {
-         Objects.requireNonNull(PainelJogo.this);
-         super();
-      }
-
-      public void mousePressed(MouseEvent var1) {
-         if (PainelJogo.this.gameState == 0 && var1.getButton() == 1) {
-            if (PainelJogo.this.btnIniciarArea.contains(var1.getPoint())) {
-               PainelJogo.this.gameState = 2;
-               PainelJogo.this.dialogoAtualIndex = 0;
-            } else if (PainelJogo.this.btnSairArea.contains(var1.getPoint())) {
-               System.exit(0);
-            }
-         }
-
-      }
-   }
-
-   class KeyHandler extends KeyAdapter {
-      KeyHandler() {
-         Objects.requireNonNull(PainelJogo.this);
-         super();
-      }
-
-      public void keyPressed(KeyEvent var1) {
-         if (PainelJogo.this.gameState == 2) {
-            if (var1.getKeyCode() == 32) {
-               ++PainelJogo.this.dialogoAtualIndex;
-               if (PainelJogo.this.dialogoAtualIndex >= PainelJogo.this.cutsceneDialogos.length) {
-                  PainelJogo.this.configurarBatalha();
-               }
-            }
-         } else if (PainelJogo.this.gameState == 1 && var1.getKeyCode() == 10) {
-            List var2 = PainelJogo.this.arena.executarRodada();
-            PainelJogo.this.logBatalha.addAll(var2);
-            PainelJogo.this.repaint();
-            Iterator var3 = var2.iterator();
-
-            while(var3.hasNext()) {
-               String var4 = (String)var3.next();
-               if (var4.contains("VENCEU")) {
-                  JOptionPane.showMessageDialog((Component)null, var4);
-                  PainelJogo.this.gameState = 0;
-               }
-            }
-         }
-
-      }
-   }
+        }
+    }
 }
