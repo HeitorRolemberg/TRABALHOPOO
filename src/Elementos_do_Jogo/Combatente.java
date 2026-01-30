@@ -7,7 +7,7 @@ public abstract class Combatente {
     protected int vida;
     protected int vidaMaxima; // Usado para calcular o tamanho da barra verde
     protected int dano;
-    protected int defesa;
+    protected int defesa; // Usado para calcular a defesa do personagem
     protected Color cor; // Cor do personagem (Azul, Roxo, Verde)
     
     public Combatente(String nome, int vida, int dano, int defesa) {
