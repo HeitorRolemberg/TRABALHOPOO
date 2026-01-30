@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import Interface.PainelJogo;
 
 public class Main {
     public static void main(String[] args) {

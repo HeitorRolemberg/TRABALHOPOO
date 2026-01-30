@@ -5,62 +5,78 @@ import java.util.List;
 import java.util.Random;
 
 public class Arena {
+
     private List<Combatente> timeA;
     private List<Combatente> timeB;
+    private int rodada;
     private Random random;
 
     public Arena() {
         timeA = new ArrayList<>();
         timeB = new ArrayList<>();
+        rodada = 1;
         random = new Random();
     }
 
-    public void adicionarCombatente(Combatente c, char time) {
-        if (time == 'A') timeA.add(c);
-        else timeB.add(c);
+    public void adicionarLadoA(Combatente c) {
+        timeA.add(c);
     }
 
-    public boolean temVivos(List<Combatente> time) {
-        for(Combatente c : time) if(c.estaVivo()) return true;
-        return false;
+    public void adicionarLadoB(Combatente c) {
+        timeB.add(c);
+    }
+
+    public List<Combatente> getTimeA() {
+        return timeA;
+    }
+
+    public List<Combatente> getTimeB() {
+        return timeB;
+    }
+
+    public boolean acabou() {
+        return todosMortos(timeA) || todosMortos(timeB);
+    }
+
+    private boolean todosMortos(List<Combatente> time) {
+        for (Combatente c : time) {
+            if (c.estaVivo()) return false;
+        }
+        return true;
     }
 
     public List<String> executarRodada() {
-        List<String> log = new ArrayList<>();
+        List<String> logs = new ArrayList<>();
+        logs.add("=== RODADA " + rodada + " ===");
 
-        if(!temVivos(timeA)){
-            log.add(">>> A HORDA DAS SOMBRAS VENCEU! <<<");
-            return log;
-        }
-        if(!temVivos(timeB)){
-            log.add(">>> A ALIANÇA DA LUZ VENCEU! <<<");
-            return log;
-        }
+        atacarTime(timeA, timeB, logs);
+        atacarTime(timeB, timeA, logs);
 
-        log.add("--- NOVA RODADA ---");
-        log.addAll(ataqueTime(timeA, timeB));
-        log.addAll(ataqueTime(timeB, timeA));
+        if (todosMortos(timeA)) logs.add("TIME B VENCEU!");
+        else if (todosMortos(timeB)) logs.add("TIME A VENCEU!");
 
-        return log;
+        rodada++;
+        return logs;
     }
 
-    private List<String> ataqueTime(List<Combatente> atacantes, List<Combatente> defensores){
-        List<String> acoes = new ArrayList<>();
-        
-        for(Combatente at : atacantes){
-            if(!at.estaVivo()) continue;
+    private void atacarTime(List<Combatente> atacantes, List<Combatente> defensores, List<String> logs) {
+        for (Combatente atacante : atacantes) {
+            if (!atacante.estaVivo()) continue;
 
-            List<Combatente> alvosVivos = new ArrayList<>();
-            for(Combatente def : defensores) if(def.estaVivo()) alvosVivos.add(def);
+            Combatente alvo = escolherAlvo(defensores);
+            if (alvo == null) continue;
 
-            if(alvosVivos.isEmpty()) break;
-
-            Combatente alvo = alvosVivos.get(random.nextInt(alvosVivos.size()));
-            acoes.add(at.atacar(alvo));
+            atacante.atacar(alvo);
+            logs.add(atacante.getNome() + " atacou " + alvo.getNome());
         }
-        return acoes;
     }
 
-    public List<Combatente> getTimeA() { return timeA; }
-    public List<Combatente> getTimeB() { return timeB; }
+    private Combatente escolherAlvo(List<Combatente> time) {
+        List<Combatente> vivos = new ArrayList<>();
+        for (Combatente c : time) {
+            if (c.estaVivo()) vivos.add(c);
+        }
+        if (vivos.isEmpty()) return null;
+        return vivos.get(random.nextInt(vivos.size()));
+    }
 }
