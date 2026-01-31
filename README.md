@@ -31,14 +31,6 @@ O projeto foi organizado em pastas para separar as partes do código:
 3. Abrir o projeto em uma IDE (Eclipse, NetBeans ou IntelliJ).
 4. Verificar se as pastas src e Imagens estão no local correto.
 
-## Como executar (pela IDE)
-
-1. Abrir o projeto na IDE.
-2. Localizar o arquivo Main.java dentro da pasta src.
-3. Clicar com o botão direito em Main.java.
-4. Selecionar a opção Executar (Run).
-5. A janela do jogo será aberta na tela.
-
 ## Como executar pelo terminal
 
 1. Abrir a pasta do projeto no computador.
