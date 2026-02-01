@@ -1,14 +1,11 @@
 package Elementos_do_Jogo;
 
-import java.awt.Color;
-
 public class Atirador extends Combatente {
     private int precisao;
 
     public Atirador(String nome){
         super(nome, 250, 0, 3);
         this.precisao = 0;
-        this.cor = Color.GREEN; // Atiradores são VERDES
     }
 
     @Override

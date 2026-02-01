@@ -1,14 +1,11 @@
 package Elementos_do_Jogo;
 
-import java.awt.Color;
-
 public class Tanque extends Combatente {
     private int vigor;
 
     public Tanque(String nome){
         super(nome, 400, 45, 5);
         this.vigor = 100;
-        this.cor = Color.BLUE; // Tanques são AZUIS
     }
 
     @Override

@@ -1,14 +1,11 @@
 package Elementos_do_Jogo;
 
-import java.awt.Color;
-
 public class Mago extends Combatente {
     private int mana;
 
     public Mago(String nome){
         super(nome, 300, 0, 2);
         this.mana = 75;
-        this.cor = new Color(128, 0, 128); // Magos são ROXOS (RGB)
     }
 
     @Override
